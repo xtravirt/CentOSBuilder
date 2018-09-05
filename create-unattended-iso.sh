@@ -270,9 +270,10 @@ echo "make iso bootable for usb (set value to $bootable): Pass"
 
 # cleanup
 umount $tmp/iso_org
-rm -rf $tmp/iso_new
-rm -rf $tmp/iso_org
-rm -rf $tmphtml
+#rm -rf $tmp/iso_new
+#rm -rf $tmp/iso_org
+#rm -rf $tmphtml
+rm -rf $tmp/*
 echo "cleanup: Pass"
 
 # print info to user
