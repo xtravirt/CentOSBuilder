@@ -42,16 +42,16 @@ d-i passwd/user-default-groups                              string      adm cdro
 d-i user-setup/encrypt-home                                 boolean     false
 
 # configure apt
-#d-i apt-setup/restricted                                    boolean     true
-#d-i apt-setup/universe                                      boolean     true
-#d-i apt-setup/backports                                     boolean     true
+d-i apt-setup/restricted                                    boolean     true
+d-i apt-setup/universe                                      boolean     true
+d-i apt-setup/backports                                     boolean     true
 #d-i apt-setup/services-select                               multiselect security
 #d-i apt-setup/security_host                                 string      http://cdimage.ubuntu.#com/ubuntu/releases/18.04
 #d-i apt-setup/security_path                                 string      /release
-#tasksel tasksel/first                                       multiselect Basic Ubuntu server
-#d-i pkgsel/upgrade                                          select      safe-upgrade
-#d-i pkgsel/update-policy                                    select      none
-#d-i pkgsel/updatedb                                         boolean     true
+tasksel tasksel/first                                       multiselect Basic Ubuntu server
+d-i pkgsel/upgrade                                          select      safe-upgrade
+d-i pkgsel/update-policy                                    select      none
+d-i pkgsel/updatedb                                         boolean     true
 #d-i pkgsel/include                                          string      openssh-server nano htop
 
 # disk partitioning
