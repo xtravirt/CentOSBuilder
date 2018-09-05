@@ -112,7 +112,7 @@ done
 
 if [ -f /etc/timezone ]; then
   timezone=`cat /etc/timezone`
-elif [ -h /etc/localtime]; then
+elif [ -h /etc/localtime ]; then
   timezone=`readlink /etc/localtime | sed "s/\/usr\/share\/zoneinfo\///"`
 else
   checksum=`md5sum /etc/localtime | cut -d' ' -f1`
@@ -143,12 +143,12 @@ if [[ ! -f $tmp/$download_file ]]; then
     download "$download_location$download_file"
 fi
 if [[ ! -f $tmp/$download_file ]]; then
-	echo "Error: Failed to download ISO: $download_location$download_file"
-	echo "This file may have moved or may no longer exist."
-	echo
-	echo "You can download it manually and move it to $tmp/$download_file"
-	echo "Then run this script again."
-	exit 1
+  echo "Error: Failed to download ISO: $download_location$download_file"
+  echo "This file may have moved or may no longer exist."
+  echo
+  echo "You can download it manually and move it to $tmp/$download_file"
+  echo "Then run this script again."
+  exit 1
 fi
 echo "Download $download_file iso: Pass"
 
@@ -156,7 +156,8 @@ echo "Download $download_file iso: Pass"
 seed_file="install.seed"
 if [[ ! -f $tmp/$seed_file ]]; then
     echo -n " downloading $seed_file: "
-    download "https://raw.githubusercontent.com/jms1989/ubuntu-unattended/master/$seed_file"
+    #download "https://raw.githubusercontent.com/jms1989/ubuntu-unattended/master/$seed_file"
+    download "https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/$seed_file"
 fi
 echo "Download seed file: Pass"
 
@@ -212,15 +213,13 @@ echo "Amend isolinux.cfg timeout value entry: Pass"
 # set late command
 
 if [ $ub1804 == "yes" ]; then
-   late_command="apt-install wget; in-target wget --no-check-certificate -O /home/$username/start.sh https://github.com/jms1989/ubuntu-unattended/raw/master/start.sh ;\
-     in-target chmod +x /home/$username/start.sh;\
+   late_command="apt-install wget; in-target wget --no-check-certificate -O /home/$username/start.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh ;\
+     in-target chmod +x /home/$username/builder.sh";\
      echo "Set late command for $ub1804: Pass"
 else
-   late_command="chroot /target wget -O /home/$username/start.sh https://github.com/jms1989/ubuntu-unattended/raw/master/start.sh ;\
-     chroot /target chmod +x /home/$username/start.sh ;\
-     chroot /target mkdir /home/$username/.ssh; chroot /target chmod 700 /home/$username/.ssh; chroot /target chown $username:$username /home/$username/.ssh;\
-     chroot /target wget http://fileserver.sanlan:80/my-machines.pub -O /home/$username/.ssh/authorized_keys; chroot /target chown $username:$username /home/$username/.ssh/authorized_keys;"
-     echo "Set late command for $non 1804 version: Pass"
+   late_command="chroot /target wget -O /home/$username/start.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh;\
+     chroot /target chmod +x /home/$username/builder.sh" ;\
+     echo "Set late command for non 1804 version: Pass"
 fi
 
 # copy the netson seed file to the iso
@@ -244,7 +243,7 @@ sed -i "s@{{username}}@$username@g" $tmp/iso_new/preseed/$seed_file
 sed -i "s@{{pwhash}}@$pwhash@g" $tmp/iso_new/preseed/$seed_file
 sed -i "s@{{hostname}}@$hostname@g" $tmp/iso_new/preseed/$seed_file
 sed -i "s@{{timezone}}@$timezone@g" $tmp/iso_new/preseed/$seed_file
-echo "update the seed file to reflect the users' choices: Pass"
+echo "update the seed file to reflect the users choices: Pass"
 
 # calculate checksum for seed file
 seed_checksum=$(md5sum $tmp/iso_new/preseed/$seed_file)
@@ -252,14 +251,14 @@ echo "Calculate checksum for seed file: Pass"
 
 # add the autoinstall option to the menu
 sed -i "/label install/ilabel autoinstall\n\
-  menu label ^Autoinstall NETSON Ubuntu Server\n\
+  menu label ^Autoinstall Ubuntu Server\n\
   kernel /install/vmlinuz\n\
-  append file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz auto=true priority=high preseed/file=/cdrom/preseed/netson.seed preseed/file/checksum=$seed_checksum --" $tmp/iso_new/isolinux/txt.cfg
+  append file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz auto=true priority=high preseed/file=/cdrom/preseed/install.seed preseed/file/checksum=$seed_checksum --" $tmp/iso_new/isolinux/txt.cfg
 echo "add the autoinstall option to the menu: Pass"
 
 echo " creating the remastered iso"
 cd $tmp/iso_new
-(mkisofs -D -r -V "NETSON_UBUNTU" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $tmp/$new_iso_name . > /dev/null 2>&1) &
+(mkisofs -D -r -V "XV_UBUNTU" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $tmp/$new_iso_name . > /dev/null 2>&1) &
 spinner $!
 echo "creating the remastered iso: Pass"
 
