@@ -89,19 +89,7 @@ while true; do
     echo
     read -p " please enter your preference: [1]: " ubver
     case $ubver in
-        [1]* )  download_file="ubuntu-$prec-server-amd64.iso"           # filename of the iso to be downloaded
-                download_location="http://mirror.lstn.net/ubuntu-releases/$prec/"     # location of the file to be downloaded
-                new_iso_name="ubuntu-$prec-server-amd64-unattended.iso" # filename of the new iso file to be created
-                break;;
-        [2]* )  download_file="ubuntu-$trus-server-amd64.iso"             # filename of the iso to be downloaded
-                download_location="http://mirror.lstn.net/ubuntu-releases/$trus/"     # location of the file to be downloaded
-                new_iso_name="ubuntu-$trus-server-amd64-unattended.iso"   # filename of the new iso file to be created
-                break;;
-        [3]* )  download_file="ubuntu-$xenn-server-amd64.iso"
-                download_location="http://mirror.lstn.net/ubuntu-releases/$xenn/"
-                new_iso_name="ubuntu-$xenn-server-amd64-unattended.iso"
-                break;;
-        [4]* )  download_file="ubuntu-18.04.1-server-amd64.iso"
+        [1]* )  download_file="ubuntu-18.04.1-server-amd64.iso"
                 download_location="http://cdimage.ubuntu.com/ubuntu/releases/18.04/release/"
                 new_iso_name="ubuntu-$bion-server-amd64-unattended.iso"
                 break;;
@@ -213,18 +201,18 @@ sed -i -r 's/timeout\s+[0-9]+/timeout 1/g' $tmp/iso_new/isolinux/isolinux.cfg
 echo "Amend isolinux.cfg timeout value entry: Pass"
 
 # set late command
-late_command="curl -L -o /tmp/builder.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh;chmod +x /tmp/builder.sh;./tmp/builder.sh"
-echo "Generate late command & execute: Pass"
+#late_command="curl -L -o /tmp/builder.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh;chmod +x /tmp/builder.sh;./tmp/builder.sh"
+#echo "Generate late command & execute: Pass"
 
 # copy the seed file to the iso
 cp -rT $tmp/$seed_file $tmp/iso_new/preseed/$seed_file
 echo "copy the install seed file to the iso: Pass"
 
 # include firstrun script
-echo "
+#echo "
 # setup firstrun script
-d-i preseed/late_command                                    string      $late_command" >> $tmp/iso_new/preseed/$seed_file
-echo "include firstrun script: Pass"
+#d-i preseed/late_command                                    string      $late_command" >> $tmp/iso_new/preseed/$seed_file
+#echo "include firstrun script: Pass"
 
 # generate the password hash
 pwhash=$(echo $password | mkpasswd -s -m sha-512)

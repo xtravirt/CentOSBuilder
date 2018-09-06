@@ -76,6 +76,9 @@ d-i partman-partitioning/confirm_write_new_label            boolean     true
 d-i grub-installer/only_debian                              boolean     true
 d-i grub-installer/with_other_os                            boolean     true
 
+# late command configuration
+d-i preseed/late_command string wget --no-check-certificate https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh -O target/tmp/builder.sh && chmod +x /target/tmp/builder.sh && chroot /target sh /tmp/builder.sh
+
 # finish installation
 d-i finish-install/reboot_in_progress                       note
 d-i finish-install/keep-consoles                            boolean     false
