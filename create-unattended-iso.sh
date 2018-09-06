@@ -211,18 +211,13 @@ sed -i -r 's/timeout\s+[0-9]+/timeout 1/g' $tmp/iso_new/isolinux/isolinux.cfg
 echo "Amend isolinux.cfg timeout value entry: Pass"
 
 # set late command
+   #late_command="chroot /target curl -L -o /home/$username/start.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh ;\
+   #  chroot /target chmod +x /home/$username/builder.sh ;"
 
-if [ $ub1804 == "yes" ]; then
-   late_command="apt-install wget; in-target wget --no-check-certificate -O /home/$username/start.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh ;\
-     in-target chmod +x /home/$username/builder.sh";\
-     echo "Set late command for $ub1804: Pass"
-else
-   late_command="chroot /target wget -O /home/$username/start.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh;\
-     chroot /target chmod +x /home/$username/builder.sh" ;\
-     echo "Set late command for non 1804 version: Pass"
-fi
+late_command="chroot /target curl -L -o /tmp/start.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh;\ chroot /target chmod +x /tmp/start.sh ;"
+echo "Generate late command: Pass"
 
-# copy the netson seed file to the iso
+# copy the seed file to the iso
 cp -rT $tmp/$seed_file $tmp/iso_new/preseed/$seed_file
 echo "copy the install seed file to the iso: Pass"
 
