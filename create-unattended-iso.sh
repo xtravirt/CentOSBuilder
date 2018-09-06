@@ -4,6 +4,8 @@
 tmp="/tmp"  # destination folder to store the final iso file
 hostname="ubuntu"
 currentuser="$( whoami)"
+build_file="builder.sh"
+seed_file="install.seed"
 
 # define spinner function for slow tasks
 # courtesy of http://fitnr.com/showing-a-bash-spinner.html
@@ -73,9 +75,9 @@ rm $tmphtml >/dev/null 2>&1
 wget -O $tmphtml 'http://mirror.lstn.net/ubuntu-releases/' >/dev/null 2>&1
 
 bion=$(fgrep Bionic $tmphtml | head -1 | awk '{print $3}')
-prec=$(fgrep Precise $tmphtml | head -1 | awk '{print $3}')
-trus=$(fgrep Trusty $tmphtml | head -1 | awk '{print $3}')
-xenn=$(fgrep Xenial $tmphtml | head -1 | awk '{print $3}')
+#prec=$(fgrep Precise $tmphtml | head -1 | awk '{print $3}')
+#trus=$(fgrep Trusty $tmphtml | head -1 | awk '{print $3}')
+#xenn=$(fgrep Xenial $tmphtml | head -1 | awk '{print $3}')
 
 
 
@@ -83,12 +85,9 @@ xenn=$(fgrep Xenial $tmphtml | head -1 | awk '{print $3}')
 while true; do
     echo " which ubuntu edition would you like to remaster:"
     echo
-    echo "  [1] Ubuntu $prec LTS Server amd64 - Precise Pangolin"
-    echo "  [2] Ubuntu $trus LTS Server amd64 - Trusty Tahr"
-    echo "  [3] Ubuntu $xenn LTS Server amd64 - Xenial Xerus"
-    echo "  [4] Ubuntu $bion LTS Server amd64 - Bionic Beaver"
+    echo "  [1] Ubuntu $bion LTS Server amd64 - Bionic Beaver"
     echo
-    read -p " please enter your preference: [1|2|3|4]: " ubver
+    read -p " please enter your preference: [1]: " ubver
     case $ubver in
         [1]* )  download_file="ubuntu-$prec-server-amd64.iso"           # filename of the iso to be downloaded
                 download_location="http://mirror.lstn.net/ubuntu-releases/$prec/"     # location of the file to be downloaded
@@ -106,7 +105,7 @@ while true; do
                 download_location="http://cdimage.ubuntu.com/ubuntu/releases/18.04/release/"
                 new_iso_name="ubuntu-$bion-server-amd64-unattended.iso"
                 break;;
-        * ) echo " please answer [1], [2], [3] or [4]";;
+        * ) echo " please answer [1]";;
     esac
 done
 
@@ -153,13 +152,16 @@ fi
 echo "Download $download_file iso: Pass"
 
 # download seed file
-seed_file="install.seed"
+
 if [[ ! -f $tmp/$seed_file ]]; then
     echo -n " downloading $seed_file: "
-    #download "https://raw.githubusercontent.com/jms1989/ubuntu-unattended/master/$seed_file"
     download "https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/$seed_file"
+    echo "Download seed file: Pass"
+    echo -n " downloading $build_file: "
+    download "https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/$build_file"
+    echo "Download builder file: Pass"
 fi
-echo "Download seed file: Pass"
+
 
 # install required packages
 echo " installing required packages"
@@ -211,11 +213,8 @@ sed -i -r 's/timeout\s+[0-9]+/timeout 1/g' $tmp/iso_new/isolinux/isolinux.cfg
 echo "Amend isolinux.cfg timeout value entry: Pass"
 
 # set late command
-   #late_command="chroot /target curl -L -o /home/$username/start.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh ;\
-   #  chroot /target chmod +x /home/$username/builder.sh ;"
-
-late_command="chroot /target curl -L -o /tmp/start.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh;\ chroot /target chmod +x /tmp/start.sh ;"
-echo "Generate late command: Pass"
+late_command="curl -L -o /tmp/builder.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh;chmod +x /tmp/builder.sh;./tmp/builder.sh"
+echo "Generate late command & execute: Pass"
 
 # copy the seed file to the iso
 cp -rT $tmp/$seed_file $tmp/iso_new/preseed/$seed_file
