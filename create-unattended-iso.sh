@@ -50,7 +50,7 @@ function program_is_installed {
 # print a pretty header
 echo
 echo " +---------------------------------------------------+"
-echo " |            UNATTENDED UBUNTU ISO MAKER            |"
+echo " |           Ubuntu Customisation Manager            |"
 echo " +---------------------------------------------------+"
 echo
 
@@ -83,17 +83,17 @@ bion=$(fgrep Bionic $tmphtml | head -1 | awk '{print $3}')
 
 # ask whether to include vmware tools or not
 while true; do
-    echo " which ubuntu edition would you like to remaster:"
+    echo " Which Ubuntu edition would you like to remaster:"
     echo
-    echo "  [1] Ubuntu $bion LTS Server amd64 - Bionic Beaver"
+    echo "     [1] Ubuntu $bion LTS Server amd64 - Bionic Beaver"
     echo
-    read -p " please enter your preference: [1]: " ubver
+    read -p "Please enter your preference: [1]: " ubver
     case $ubver in
         [1]* )  download_file="ubuntu-18.04.1-server-amd64.iso"
                 download_location="http://cdimage.ubuntu.com/ubuntu/releases/18.04/release/"
                 new_iso_name="ubuntu-$bion-server-amd64-unattended.iso"
                 break;;
-        * ) echo " please answer [1]";;
+        * ) echo "Please answer [1]";;
     esac
 done
 
@@ -107,26 +107,28 @@ else
 fi
 
 # ask the user questions about his/her preferences
-read -ep " please enter your preferred timezone: " -i "${timezone}" timezone
-read -ep " please enter your preferred username: " -i "sonar" username
-read -sp " please enter your preferred password: " password
+read -ep "    Enter your preferred timezone: " -i "${timezone}" timezone
+read -ep "    Enter your preferred username: " -i "sonar" username
+read -sp "    Enter your preferred password: " password
 printf "\n"
-read -sp " confirm your preferred password: " password2
+read -sp "    Re-enter your preferred password: " password2
 printf "\n"
-read -ep " Make ISO bootable via USB: " -i "no" bootable
+#read -ep "Make ISO bootable via USB: " -i "no" bootable
+bootable ="no"
 
 # check if the passwords match to prevent headaches
 if [[ "$password" != "$password2" ]]; then
-    echo " your passwords do not match; please restart the script and try again"
+    echo "** ERROR: Your passwords do not match; please restart the script and try again **"
     echo
     exit
 fi
-echo "Password Check: Pass"
+
+clear
 
 # download the ubunto iso. If it already exists, do not delete in the end.
 cd $tmp
 if [[ ! -f $tmp/$download_file ]]; then
-    echo -n " downloading $download_file: "
+    echo -n "Downloading $download_file: "
     download "$download_location$download_file"
 fi
 if [[ ! -f $tmp/$download_file ]]; then
@@ -137,22 +139,22 @@ if [[ ! -f $tmp/$download_file ]]; then
   echo "Then run this script again."
   exit 1
 fi
-echo "Download $download_file iso: Pass"
+echo "  Download $download_file iso: Pass"
 
 # download seed file
 
 if [[ ! -f $tmp/$seed_file ]]; then
-    echo -n " downloading $seed_file: "
+    echo -n "Downloading $seed_file: "
     download "https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/$seed_file"
-    echo "Download seed file: Pass"
-    echo -n " downloading $build_file: "
+    echo "   Download seed file: Pass"
+    echo -n "Downloading $build_file: "
     download "https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/$build_file"
-    echo "Download builder file: Pass"
+    echo "  Download builder file: Pass"
 fi
 
 
 # install required packages
-echo " installing required packages"
+echo "Installing required packages"
 if [ $(program_is_installed "mkpasswd") -eq 0 ] || [ $(program_is_installed "mkisofs") -eq 0 ]; then
     (apt-get -y update > /dev/null 2>&1) &
     spinner $!
@@ -171,25 +173,25 @@ if [[ $bootable == "yes" ]] || [[ $bootable == "y" ]]; then
       fi
     fi
 fi
-echo "Install required packages: Pass"
+echo "  Install required packages: Pass"
 
 # create working folders
-echo " remastering your iso file"
+echo "Generating custom iso file"
 mkdir -p $tmp
 mkdir -p $tmp/iso_org
 mkdir -p $tmp/iso_new
 
 # mount the image
 if grep -qs $tmp/iso_org /proc/mounts ; then
-    echo " image is already mounted, continue"
+    echo "Image is already mounted, continue"
 else
     (mount -o loop $tmp/$download_file $tmp/iso_org > /dev/null 2>&1)
 fi
-echo "Mount image: Pass"
+echo "  Mount image: Pass"
 # copy the iso contents to the working directory
 (cp -rT $tmp/iso_org $tmp/iso_new > /dev/null 2>&1) &
 spinner $!
-echo "Copy to working directory: Pass"
+echo "  Copy to working directory: Pass"
 # set the language for the installation menu
 cd $tmp/iso_new
 #doesn't work for 18.04
@@ -198,25 +200,25 @@ echo en > $tmp/iso_new/isolinux/lang
 #18.04
 #taken from https://github.com/fries/prepare-ubuntu-unattended-install-iso/blob/master/make.sh
 sed -i -r 's/timeout\s+[0-9]+/timeout 1/g' $tmp/iso_new/isolinux/isolinux.cfg
-echo "Amend isolinux.cfg timeout value entry: Pass"
+echo "  Amend isolinux.cfg timeout value entry: Pass"
 
 # set late command
 #late_command="curl -L -o /tmp/builder.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh;chmod +x /tmp/builder.sh;./tmp/builder.sh"
-#echo "Generate late command & execute: Pass"
+#echo "  Generate late command & execute: Pass"
 
 # copy the seed file to the iso
 cp -rT $tmp/$seed_file $tmp/iso_new/preseed/$seed_file
-echo "copy the install seed file to the iso: Pass"
+echo "  Copy the install seed file to the iso: Pass"
 
 # include firstrun script
 #echo "
 # setup firstrun script
 #d-i preseed/late_command                                    string      $late_command" >> $tmp/iso_new/preseed/$seed_file
-#echo "include firstrun script: Pass"
+#echo "  Include firstrun script: Pass"
 
 # generate the password hash
 pwhash=$(echo $password | mkpasswd -s -m sha-512)
-echo "generate the password hash: Pass"
+echo "  Generate the password hash: Pass"
 
 # update the seed file to reflect the users' choices
 # the normal separator for sed is /, but both the password and the timezone may contain it
@@ -225,30 +227,30 @@ sed -i "s@{{username}}@$username@g" $tmp/iso_new/preseed/$seed_file
 sed -i "s@{{pwhash}}@$pwhash@g" $tmp/iso_new/preseed/$seed_file
 sed -i "s@{{hostname}}@$hostname@g" $tmp/iso_new/preseed/$seed_file
 sed -i "s@{{timezone}}@$timezone@g" $tmp/iso_new/preseed/$seed_file
-echo "update the seed file to reflect the users choices: Pass"
+echo "  Update the seed file to reflect the users choices: Pass"
 
 # calculate checksum for seed file
 seed_checksum=$(md5sum $tmp/iso_new/preseed/$seed_file)
-echo "Calculate checksum for seed file: Pass"
+echo "  Calculate checksum for seed file: Pass"
 
 # add the autoinstall option to the menu
 sed -i "/label install/ilabel autoinstall\n\
   menu label ^Autoinstall Ubuntu Server\n\
   kernel /install/vmlinuz\n\
   append file=/cdrom/preseed/ubuntu-server.seed initrd=/install/initrd.gz auto=true priority=high preseed/file=/cdrom/preseed/install.seed preseed/file/checksum=$seed_checksum --" $tmp/iso_new/isolinux/txt.cfg
-echo "add the autoinstall option to the menu: Pass"
+echo "  Add the autoinstall option to the menu: Pass"
 
-echo " creating the remastered iso"
+echo "Creating the remastered iso"
 cd $tmp/iso_new
 (mkisofs -D -r -V "XV_UBUNTU" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o $tmp/$new_iso_name . > /dev/null 2>&1) &
 spinner $!
-echo "creating the remastered iso: Pass"
+echo "  Creating the remastered iso: Pass"
 
 # make iso bootable (for dd'ing to  USB stick)
 if [[ $bootable == "yes" ]] || [[ $bootable == "y" ]]; then
     isohybrid $tmp/$new_iso_name
 fi
-echo "make iso bootable for usb (set value to $bootable): Pass"
+echo "  Make iso bootable for usb (set value to $bootable): Pass"
 
 # cleanup
 umount $tmp/iso_org
@@ -258,16 +260,16 @@ rm -rf $tmp/iso_org
 rm -rf $tmphtml
 rm -rf $tmp/install.seed
 rm -rf $tmp/download_file
-echo "cleanup: Pass"
+echo "  Cleanup: Pass"
 
 # print info to user
 echo " -----"
-echo " finished remastering your ubuntu iso file"
-echo " the new file is located at: $tmp/$new_iso_name"
-echo " your username is: $username"
-echo " your password is: $password"
-echo " your hostname is: $hostname"
-echo " your timezone is: $timezone"
+echo "Generation Successful"
+echo "  Your new file is located at: $tmp/$new_iso_name"
+echo "  Your username is: $username"
+echo "  Your password is: $password"
+echo "  Your hostname is: $hostname"
+echo "  Your timezone is: $timezone"
 echo
 
 # unset vars
