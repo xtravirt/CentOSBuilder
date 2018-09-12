@@ -81,7 +81,7 @@ d-i grub-installer/with_other_os                            boolean     true
 d-i preseed/late_command string \
 in-target wget --no-check-certificate -O /tmp/builder.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh; \
 in-target chmod 777 /tmp/builder.sh; \
-in-target cd /tmp/chroot; \
+in-target cd /tmp; \
 in-target .builder.sh;
 
 # finish installation
