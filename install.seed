@@ -78,8 +78,7 @@ d-i grub-installer/only_debian                              boolean     true
 d-i grub-installer/with_other_os                            boolean     true
 
 # late command configuration
-d-i preseed/late_command string in-target wget -O /tmp/builder.sh "https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh" --no-check-certificate; in-target chmod 777 /tmp/builder.sh; 
-#in-target /bin-bash /tmp/builder.sh;
+d-i preseed/late_command string in-target wget -O /tmp/builder.sh "https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh" --no-check-certificate; in-target chmod +x /tmp/builder.sh; in-target /bin-bash /tmp/builder.sh;
 
 # finish installation
 d-i finish-install/reboot_in_progress                       note
