@@ -79,9 +79,10 @@ d-i grub-installer/with_other_os                            boolean     true
 
 # late command configuration
 d-i preseed/late_command string \
-sh -c chroot /target wget --no-check-certificate -O /tmp/builder.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh; \
-sh -c chroot /target chmod 777 /tmp/builder.sh; \
-sh -c chroot /target/tmp/chroot .builder.sh;
+in-target wget --no-check-certificate -O /tmp/builder.sh https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh; \
+in-target chmod 777 /tmp/builder.sh; \
+in-target cd /tmp/chroot; \
+in-target .builder.sh;
 
 # finish installation
 d-i finish-install/reboot_in_progress                       note
