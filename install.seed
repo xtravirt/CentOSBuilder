@@ -1,3 +1,7 @@
+# unattended installation
+d-i auto-install/enable boolean true
+d-i debconf/priority select critical
+
 # regional setting
 d-i debian-installer/language                               string      en_US:en
 d-i debian-installer/country                                string      US
