@@ -1,18 +1,20 @@
 #!/bin/bash
-set -e
+echo "Set Interpreter"
+ set -e
 
 # update repos
+echo "Updating Repositories"
 apt-get -y update
-apt-get -y -o Dpkg::Options::="--force-confold" upgrade 
+apt-get -y -o Dpkg::Options::="--force-confold" upgrade
 
 # Installation of Jenkins
-wget https://pkg.jenkins.io/debian/jenkins.io.key
-apt-key add jenkins.io.key
+echo "Installing Jenkins"
+cd /tmp wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
 sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
 apt-get update
-apt-get install unzip ccze slurm ncdu nano nmon mingetty screen open-vm-tools apt-transport-https openjdk-8-jdk -y
-apt-get update
 apt-get install jenkins -y
+ufw allow 8080
+systemctl start jenkins
 
 # Installation of Packer
 echo "Create Packer Directory & Configure Permissions"
@@ -26,15 +28,15 @@ unzip packer_1.2.5_linux_amd64.zip -d /packer
 
 # Download Packer scripts from Sonar Github Account
 echo "Download custom packer scripts and locate"
+cd /tmp
 wget https://github.com/xtravirt/packer/archive/master.zip
 unzip master.zip -d /tmp
 mv /tmp/packer-master/* /packer
 
 # Configure variables
+echo "Update Environment"
 export NMON=mndc
 export PATH="$PATH:/usr/local/packer"
-echo "Update Environment"
-source /etc/environment
 
 # Clean up files that are no longer needed
 echo "Perform file system cleanup activity"
@@ -42,9 +44,5 @@ rm -f /tmp/master.zip
 rm -f /tmp/packer_1.2.5_linux_amd64.zip
 rm -d -f /tmp/packer-master
 rm -f /tmp/jenkins.io.key
-
 apt-get -y autoremove
 apt-get -y purge
-
-# reboot
-reboot
