@@ -20,7 +20,7 @@ systemctl start jenkins
 # Installation of Packer
 echo "Create Packer Directory & Configure Permissions"
 mkdir "/opt/packer"
-chmod 777 "/opt/packer"
+#chmod 777 "/opt/packer"
 cd "/tmp"
 echo "Download packer_1.2.5_linux_amd64"
 wget https://releases.hashicorp.com/packer/1.2.5/packer_1.2.5_linux_amd64.zip
