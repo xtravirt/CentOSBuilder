@@ -100,9 +100,9 @@ d-i grub-installer/with_other_os                            boolean     true
 ubiquity  ubiquity/success_command string \
 in-target wget -O /tmp/builder.sh "https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh" --no-check-certificate; \
 in-target /bin/chmod +x /tmp/builder.sh \
-in-target /bin/cd /tmp && ./builder.sh; \
+in-target cd /tmp && ./builder.sh; \
 in-target /bin/echo "Completed Late Command Configuration"; \
-in-target /bin/cd /home/sonar && touch lateCommandsCompleted.txt;
+in-target cd /home/sonar && touch lateCommandsCompleted.txt;
 
 # finish installation
 d-i finish-install/reboot_in_progress                       note
