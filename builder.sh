@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 echo "Set Interpreter"
- set -e
+set -e
 
 # update repos
 echo "Updating Repositories"
@@ -23,15 +23,15 @@ mkdir "/opt/packer"
 chmod 777 "/opt/packer"
 cd "/tmp"
 echo "Download packer_1.2.5_linux_amd64"
-wget "https://releases.hashicorp.com/packer/1.2.5/packer_1.2.5_linux_amd64.zip"
+wget https://releases.hashicorp.com/packer/1.2.5/packer_1.2.5_linux_amd64.zip
 echo "Extract and place packer"
 unzip packer_1.2.5_linux_amd64.zip -d "/opt/packer"
 
 # Download Packer scripts from Sonar Github Account
 echo "Download custom packer scripts and locate"
 cd "/tmp"
-wget "https://github.com/xtravirt/packer/archive/master.zip"
-unzip master.zip -d "/tmp"
+wget https://github.com/xtravirt/packer/archive/master.zip
+unzip master.zip -d /tmp
 mv /tmp/packer-master/* "/opt/packer"
 
 # Configure variables
