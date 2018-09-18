@@ -74,7 +74,7 @@ d-i mirror/http/proxy 					                            string
 #d-i apt-setup/security_path                                string      /release
 
 ### Package selection
-#tasksel tasksel/first                                       multiselect standard
+tasksel tasksel/first                                       multiselect web-server
 #d-i pkgsel/upgrade                                         select      safe-upgrade
 d-i pkgsel/upgrade                                          select      none
 d-i pkgsel/update-policy                                    select      none
