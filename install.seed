@@ -45,21 +45,6 @@ d-i user-setup/allow-password-weak                          boolean     false
 d-i passwd/user-default-groups                              string      adm cdrom dialout lpadmin plugdev sambashare
 d-i user-setup/encrypt-home                                 boolean     false
 
-# configure apt
-d-i apt-setup/restricted                                    boolean     true
-d-i apt-setup/universe                                      boolean     true
-d-i apt-setup/backports                                     boolean     true
-d-i mirror/http/proxy 					    string
-#d-i apt-setup/services-select                               multiselect security
-#d-i apt-setup/security_host                                 string      http://cdimage.ubuntu.#com/ubuntu/releases/18.04
-#d-i apt-setup/security_path                                 string      /release
-tasksel tasksel/first                                       multiselect web-server
-d-i pkgsel/upgrade                                          select      safe-upgrade
-d-i pkgsel/update-policy                                    select      none
-d-i pkgsel/updatedb                                         boolean     true
-#d-i pkgsel/include                                          string      openssh-server nano htop
-d-i pkgsel/include                                          string      install wget unzip ccze slurm ncdu nano nmon mingetty openssh-server screen open-vm-tools apt-transport-https openjdk-8-jdk
-
 # disk partitioning
 d-i partman/confirm_write_new_label                         boolean     true
 d-i partman/choose_partition                                select      finish
@@ -77,6 +62,29 @@ d-i partman-auto/method                                     string      lvm
 d-i partman-auto-lvm/guided_size                            string      max
 d-i partman-partitioning/confirm_write_new_label            boolean     true
 
+# configure apt
+d-i apt-setup/restricted                                    boolean     true
+d-i apt-setup/universe                                      boolean     true
+d-i apt-setup/backports                                     boolean     true
+d-i apt-setup/non-free                                      boolean     true
+d-i apt-setup/contrib                                       boolean     true
+d-i mirror/http/proxy 					                            string
+#d-i apt-setup/services-select                              multiselect security
+#d-i apt-setup/security_host                                string      http://cdimage.ubuntu.#com/ubuntu/releases/18.04
+#d-i apt-setup/security_path                                string      /release
+
+### Package selection
+tasksel tasksel/first                                       multiselect standard
+#d-i pkgsel/upgrade                                         select      safe-upgrade
+d-i pkgsel/upgrade                                          select      none
+d-i pkgsel/update-policy                                    select      none
+d-i pkgsel/updatedb                                         boolean     true
+#d-i pkgsel/include                                         string      openssh-server nano htop
+d-i pkgsel/include                                          string      wget unzip ccze slurm ncdu nano nmon mingetty openssh-server screen open-vm-tools apt-transport-https openjdk-8-jdk
+#d-i pkgsel/include                                          string      openssh-server rsync ncdu 
+popularity-contest popularity-contest/participate           boolean     false
+
+
 # grub boot loader
 d-i grub-installer/only_debian                              boolean     true
 d-i grub-installer/with_other_os                            boolean     true
@@ -92,7 +100,8 @@ ubiquity  ubiquity/success_command string \
 in-target wget -O /tmp/builder.sh "https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh" --no-check-certificate; \
 in-target /bin/chmod +x /tmp/builder.sh \
 in-target /bin/cd /tmp && ./builder.sh; \
-in-target /bin/echo "Completed Late Command Configuration";
+in-target /bin/echo "Completed Late Command Configuration"; \
+in-target /bin/cd && touch lateCommandsCompleted.txt;
 
 # finish installation
 d-i finish-install/reboot_in_progress                       note
