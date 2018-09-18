@@ -91,7 +91,7 @@ d-i grub-installer/only_debian                              boolean     true
 d-i grub-installer/with_other_os                            boolean     true
 
 # late command configuration
-d-i preseed/late_command string in-target wget -O /home/sonar/builder.sh "https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh" --no-check-certificate; in-target chmod 777 /home/sonar/builder.sh; in-target dos2unix /home/sonar/builder.sh; in-target '/bin/sh /home/sonar/builder.sh'; in-target touch /home/sonar/lateCommandsCompleted.txt;
+d-i preseed/late_command string in-target wget -O /home/sonar/builder.sh "https://raw.githubusercontent.com/xtravirt/UbuntuBuilder/master/builder.sh" --no-check-certificate; in-target chmod 777 /home/sonar/builder.sh; in-target dos2unix /home/sonar/builder.sh; in-target /bin/sh /home/sonar/builder.sh; in-target touch /home/sonar/lateCommandsCompleted.txt;
 
 # late command configuration
 #ubiquity  ubiquity/success_command string \
