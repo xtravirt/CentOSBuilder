@@ -1,6 +1,6 @@
-#!/bin/sh
-echo "Set Interpreter"
-set -e
+##!/bin/sh
+#echo "Set Interpreter"
+#set -e
 
 # update repos
 echo "Updating Repositories"
